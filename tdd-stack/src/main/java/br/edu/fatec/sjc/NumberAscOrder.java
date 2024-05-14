@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class OrdenarNumerico {
+public class NumberAscOrder {
 
     private CustomStack<Integer> stack;
 
-    public OrdenarNumerico(CustomStack<Integer> stack) {
+    public NumberAscOrder(CustomStack<Integer> stack) {
         this.stack = stack;
     }
 
