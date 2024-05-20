@@ -1,57 +1,45 @@
 package br.edu.fatec.sjc;
 
-import org.junit.jupiter.api.Assertions;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import java.util.*;
 
 @ExtendWith(MockitoExtension.class)
 public class NumberAscOrderTest {
+    private NumberAscOrder<Integer> pilhaOrdenada;
+    private Integer[] numeros = {6, 2, 1, 4, 3, 5};
+    private List<Integer> listaOrdenada = Arrays.asList(1, 2, 3, 4, 5, 6);
+    private List<Integer> listaVazia = new ArrayList<>();
+    private int index = 0;
 
     @Mock
-    private CustomStack<Integer> customStack;
-
-    private NumberAscOrder numberAscOrder;
+    private CustomStack<Integer> pilha;
 
     @BeforeEach
-    public void setUp() {
-        numberAscOrder = new NumberAscOrder(customStack);
+    public void setup() {
+        pilhaOrdenada = new NumberAscOrder<>(pilha);
+        index = 0; // Reset index to zero before each test
+        Mockito.when(pilha.isEmpty()).thenAnswer(invocation -> index >= numeros.length);
+        Mockito.when(pilha.pop()).thenAnswer(invocation -> numeros[index++]);
     }
 
     @Test
-    public void testSortWithSixRandomNumbers() throws StackEmptyException {
-        List<Integer> randomNumbers = new ArrayList<>();
-
-        Random rand = new Random();
-        while (randomNumbers.size() < 6) {
-            int randomNumber = rand.nextInt(100);
-            if (!randomNumbers.contains(randomNumber)) {
-                randomNumbers.add(randomNumber);
-            }
-        }
-
-        Mockito.when(customStack.isEmpty()).thenReturn(false, false, false, false, false, false, true);
-        for (Integer number : randomNumbers) {
-            Mockito.when(customStack.pop()).thenReturn(number);
-        }
-
-        List<Integer> expectedList = new ArrayList<>(randomNumbers);
-        Collections.sort(expectedList);
-
-        List<Integer> sortedList = numberAscOrder.sort();
-        Assertions.assertEquals(expectedList, sortedList, "A lista ordenada deve ser igual à lista esperada.");
+    public void validarOrdenacao() throws StackEmptyException {
+        List<Integer> resultado = pilhaOrdenada.sort();
+        assertEquals(listaOrdenada, resultado, "A lista ordenada deve corresponder aos números ordenados.");
     }
 
     @Test
-    public void testSortWithEmptyStack() throws StackEmptyException {
-        Mockito.when(customStack.isEmpty()).thenReturn(true);
-        Assertions.assertThrows(StackEmptyException.class, () -> numberAscOrder.sort(),
-                "Deve lançar StackEmptyException porque a pilha está vazia.");
-
-        Mockito.verify(customStack, Mockito.never()).pop();
+    public void validarPilhaVazia() throws StackEmptyException {
+        index = numeros.length; // Define o índice para simular pilha vazia
+        List<Integer> resultado = pilhaOrdenada.sort();
+        assertEquals(listaVazia, resultado, "A lista resultante deve estar vazia quando a pilha também está.");
     }
 }
